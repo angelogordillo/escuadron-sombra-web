@@ -56,26 +56,35 @@ app.post('/api/register', async (req, res) => {
 app.get('/admin', requireAdmin, async (req, res) => {
   if (!pool) return res.status(503).send('Base de datos no configurada todavía.');
   const { rows } = await pool.query(
-    'SELECT name, email, wants_event, created_at FROM registrations ORDER BY created_at DESC'
+    'SELECT id, name, email, wants_event, created_at FROM registrations ORDER BY created_at DESC'
   );
+  const token = encodeURIComponent(req.query.token);
   const rowsHtml = rows
     .map(
       (r) =>
-        `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.email)}</td><td>${r.wants_event ? 'Sí' : 'No'}</td><td>${new Date(r.created_at).toLocaleString('es-CL')}</td></tr>`
+        `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.email)}</td><td>${r.wants_event ? 'Sí' : 'No'}</td><td>${new Date(r.created_at).toLocaleString('es-CL')}</td><td><a class="del" href="/admin/delete/${r.id}?token=${token}" onclick="return confirm('¿Borrar este registro?')">Borrar</a></td></tr>`
     )
     .join('');
   res.send(`<!doctype html><html><head><meta charset="utf-8"><title>Registros — Escuadrón Sombra</title>
   <style>
     body{font-family:-apple-system,sans-serif;background:#221a12;color:#f0e4d2;padding:32px;}
-    table{border-collapse:collapse;width:100%;max-width:800px;}
+    table{border-collapse:collapse;width:100%;max-width:840px;}
     th,td{border-bottom:1px solid #40331f;padding:8px 12px;text-align:left;font-size:14px;}
     th{color:#dfa159;}
     a.button{display:inline-block;margin-bottom:16px;background:#b3743a;color:#fbf6ec;padding:8px 16px;border-radius:999px;text-decoration:none;font-weight:600;}
+    a.del{color:#c4b298;font-size:13px;}
+    a.del:hover{color:#dfa159;}
   </style></head><body>
   <h1>Registros de preventa (${rows.length})</h1>
-  <a class="button" href="/admin/export.csv?token=${encodeURIComponent(req.query.token)}">Descargar CSV</a>
-  <table><thead><tr><th>Nombre</th><th>Correo</th><th>Evento octubre</th><th>Fecha</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+  <a class="button" href="/admin/export.csv?token=${token}">Descargar CSV</a>
+  <table><thead><tr><th>Nombre</th><th>Correo</th><th>Evento octubre</th><th>Fecha</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table>
   </body></html>`);
+});
+
+app.get('/admin/delete/:id', requireAdmin, async (req, res) => {
+  if (!pool) return res.status(503).send('Base de datos no configurada todavía.');
+  await pool.query('DELETE FROM registrations WHERE id = $1', [req.params.id]);
+  res.redirect('/admin?token=' + encodeURIComponent(req.query.token));
 });
 
 app.get('/admin/export.csv', requireAdmin, async (req, res) => {
