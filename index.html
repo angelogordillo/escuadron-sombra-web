@@ -196,6 +196,18 @@
   .lede { font-size: 1.08rem; color: var(--ink-soft); }
 
   /* ---------- EXCERPT ---------- */
+  /* ---------- POSTER ---------- */
+  .poster-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  .poster {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 18px;
+    box-shadow: 0 24px 48px -20px var(--shadow);
+  }
+
   .excerpt {
     background: var(--bg-elevated);
   }
@@ -317,6 +329,12 @@
     <p class="byline">Una novela de Angelo Gordillo</p>
   </div>
 </div>
+
+<section class="tight reveal">
+  <div class="wrap poster-wrap">
+    <img class="poster" src="images/poster.jpg" alt="Afiche de Escuadrón Sombra: dos esgrimistas cruzando espadas">
+  </div>
+</section>
 
 <section class="excerpt reveal" id="muestra">
   <div class="wrap">
