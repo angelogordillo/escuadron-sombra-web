@@ -406,15 +406,21 @@
       var email = document.getElementById('waitlist-email').value.trim();
       var wantsEvent = document.getElementById('waitlist-event').checked;
       if (!name || !email) return;
-      var subject = encodeURIComponent('Registro preventa Escuadrón Sombra');
-      var body = encodeURIComponent(
-        'Quiero registrarme para la preventa de Escuadrón Sombra.\n\n' +
-        'Nombre: ' + name + '\n' +
-        'Correo: ' + email + '\n' +
-        'Asistir al evento de lanzamiento en octubre: ' + (wantsEvent ? 'Sí' : 'No')
-      );
-      window.location.href = 'mailto:angelogordillo@gmail.com?subject=' + subject + '&body=' + body;
-      status.textContent = 'Abriendo tu app de correo — confirma el envío desde ahí.';
+      status.textContent = 'Enviando…';
+      fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, wantsEvent: wantsEvent })
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('bad response');
+          status.textContent = 'Listo — quedaste registrado para la preventa.';
+          form.reset();
+          document.getElementById('waitlist-event').checked = true;
+        })
+        .catch(function () {
+          status.textContent = 'No pudimos registrarte. Escríbenos a angelogordillo@gmail.com con tu nombre y correo.';
+        });
     });
   })();
 
