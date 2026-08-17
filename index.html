@@ -236,14 +236,14 @@
 
   .waitlist-form {
     display: flex;
-    gap: 10px;
-    max-width: 420px;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 380px;
     margin: 26px auto 12px;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: stretch;
   }
-  .waitlist-form input {
-    flex: 1 1 220px;
+  .waitlist-form input[type="text"],
+  .waitlist-form input[type="email"] {
     font-family: var(--font-body);
     font-size: 0.95rem;
     padding: 13px 18px;
@@ -251,13 +251,30 @@
     border: 1px solid var(--rule);
     background: var(--bg-elevated);
     color: var(--ink);
+    width: 100%;
   }
   .waitlist-form input:focus {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  .waitlist-form button {
+  .waitlist-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    text-align: left;
+  }
+  .waitlist-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
     flex: 0 0 auto;
+  }
+  .waitlist-form button {
+    margin-top: 4px;
+    justify-content: center;
   }
 
   .waitlist-note {
@@ -338,15 +355,20 @@
   <div class="wrap">
     <hr class="rule" style="margin-bottom: 52px;">
     <div class="waitlist" id="lista-de-espera">
-      <div class="kicker">Lista de espera</div>
-      <h2>Sé de los primeros en leerla</h2>
-      <p class="lede">Aún no tenemos fecha de lanzamiento ni precio definidos. Déjanos tu correo y te avisamos apenas abramos la preventa — con acceso anticipado antes que nadie.</p>
+      <div class="kicker">Preventa y evento de lanzamiento</div>
+      <h2>Regístrate para la preventa</h2>
+      <p class="lede">El evento de lanzamiento de Escuadrón Sombra será en octubre. Regístrate para asegurar tu lugar en la preventa y recibir la invitación.</p>
       <form class="waitlist-form" id="waitlist-form">
+        <input type="text" id="waitlist-name" placeholder="Tu nombre" required aria-label="Tu nombre">
         <input type="email" id="waitlist-email" placeholder="tu@correo.com" required aria-label="Tu correo electrónico">
-        <button type="submit" class="btn btn-primary">Avísenme</button>
+        <label class="waitlist-checkbox">
+          <input type="checkbox" id="waitlist-event" checked>
+          Quiero asistir al evento de lanzamiento en octubre
+        </label>
+        <button type="submit" class="btn btn-primary">Registrarme</button>
       </form>
       <div class="waitlist-status" id="waitlist-status" role="status"></div>
-      <p class="waitlist-note">Se abrirá tu app de correo para enviarnos tu dirección directamente. Sin listas de terceros, sin spam.</p>
+      <p class="waitlist-note">Se abrirá tu app de correo para enviarnos tus datos directamente. Sin listas de terceros, sin spam.</p>
     </div>
   </div>
 </section>
@@ -362,10 +384,17 @@
     var status = document.getElementById('waitlist-status');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var name = document.getElementById('waitlist-name').value.trim();
       var email = document.getElementById('waitlist-email').value.trim();
-      if (!email) return;
-      var subject = encodeURIComponent('Avísenme cuando salga Escuadrón Sombra');
-      var body = encodeURIComponent('Quiero unirme a la lista de espera de Escuadrón Sombra.\n\nMi correo: ' + email);
+      var wantsEvent = document.getElementById('waitlist-event').checked;
+      if (!name || !email) return;
+      var subject = encodeURIComponent('Registro preventa Escuadrón Sombra');
+      var body = encodeURIComponent(
+        'Quiero registrarme para la preventa de Escuadrón Sombra.\n\n' +
+        'Nombre: ' + name + '\n' +
+        'Correo: ' + email + '\n' +
+        'Asistir al evento de lanzamiento en octubre: ' + (wantsEvent ? 'Sí' : 'No')
+      );
       window.location.href = 'mailto:angelogordillo@gmail.com?subject=' + subject + '&body=' + body;
       status.textContent = 'Abriendo tu app de correo — confirma el envío desde ahí.';
     });
